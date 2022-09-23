@@ -6,14 +6,17 @@ namespace RL.Algorithm.VecEnvs;
 
 public class SubprocVecEnv : VecEnv
 {
-    public SubprocVecEnv(BaseEnv<DigitalSpace>[] numEnvs) : base(numEnvs) { }
+    public BaseEnv<DigitalSpace>[] Envs { get; init; }
+
+    public SubprocVecEnv(BaseEnv<DigitalSpace>[] envs) : base(envs)
+        => this.Envs = envs;
 
     public override ResetResult Reset(uint? seed = null, Dictionary<string, dynamic>? options = null)
     {
-        var observations = new ndarray[NumEnvs.Length];
-        var infos = new Dictionary<string, dynamic>[NumEnvs.Length];
-        Parallel.For(0, NumEnvs.Length, i => {
-            BaseRLEnv.ResetResult reset = NumEnvs[i].Reset(seed, options);
+        var observations = new ndarray[NumEnvs];
+        var infos = new Dictionary<string, dynamic>[NumEnvs];
+        Parallel.For(0, NumEnvs, i => {
+            BaseRLEnv.ResetResult reset = Envs[i].Reset(seed, options);
             observations[i] = reset.Observation;
             infos[i] = reset.Info;
         });
@@ -22,13 +25,13 @@ public class SubprocVecEnv : VecEnv
 
     public override StepResult Step(ndarray action)
     {
-        var observations = new ndarray[NumEnvs.Length];
-        var rewards = new double[NumEnvs.Length];
-        var terminated = new bool[NumEnvs.Length];
-        var truncated = new bool[NumEnvs.Length];
-        var infos = new Dictionary<string, dynamic>[NumEnvs.Length];
-        Parallel.For(0, NumEnvs.Length, i => {
-            BaseRLEnv.StepResult step = NumEnvs[i].Step((action[i] as ndarray)!);
+        var observations = new ndarray[NumEnvs];
+        var rewards = new double[NumEnvs];
+        var terminated = new bool[NumEnvs];
+        var truncated = new bool[NumEnvs];
+        var infos = new Dictionary<string, dynamic>[NumEnvs];
+        Parallel.For(0, NumEnvs, i => {
+            BaseRLEnv.StepResult step = Envs[i].Step((action[i] as ndarray)!);
             observations[i] = step.Observation;
             rewards[i] = step.Reward;
             terminated[i] = step.Terminated;
@@ -41,18 +44,18 @@ public class SubprocVecEnv : VecEnv
     public override ndarray? Render(RanderMode randerMode)
     {
         List<ndarray> images = new();
-        for (var i = 0; i < NumEnvs.Length; i++)
+        for (var i = 0; i < NumEnvs; i++)
         {
-            ndarray? image = NumEnvs[i].Render(randerMode);
+            ndarray? image = Envs[i].Render(randerMode);
             if (image is not null)
                 images.Add(image);
         }
-        return images.Count == NumEnvs.Length ? np.stack(images.ToArray()) : null;
+        return images.Count == NumEnvs ? np.stack(images.ToArray()) : null;
     }
 
     public override void Close()
     {
-        Parallel.ForEach(NumEnvs, env => {
+        Parallel.ForEach(Envs, env => {
             env.Close();
         });
     }

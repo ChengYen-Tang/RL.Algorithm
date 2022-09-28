@@ -2,7 +2,6 @@
 using BaseRLEnv.Spaces;
 using BaseRLEnv.Utils;
 using NumpyDotNet;
-using Serilog;
 
 namespace RL.Algorithm.VecEnvs;
 

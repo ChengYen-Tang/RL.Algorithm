@@ -9,6 +9,9 @@ public abstract class VecEnvWrapper : VecEnv
     public VecEnvWrapper(VecEnv vEnv)
         : this(vEnv, vEnv.ActionSpace, vEnv.ObservationSpace) { }
 
+    public VecEnvWrapper(VecEnv vEnv, DigitalSpace observationSpace)
+        : this(vEnv, vEnv.ActionSpace, observationSpace) { }
+
     public VecEnvWrapper(VecEnv vEnv, DigitalSpace actionSpace, DigitalSpace observationSpace)
         : base(actionSpace, observationSpace, vEnv.RewardRange, vEnv.NumEnvs)
     {

@@ -1,6 +1,4 @@
 ﻿using BaseRLEnv.Spaces;
-using NumpyDotNet;
-using Serilog;
 
 namespace RL.Algorithm;
 

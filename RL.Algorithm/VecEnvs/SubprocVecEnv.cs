@@ -1,9 +1,14 @@
 ﻿using BaseRLEnv.Spaces;
 using BaseRLEnv;
-using NumpyDotNet;
 
 namespace RL.Algorithm.VecEnvs;
 
+/// <summary>
+/// Creates a multiprocess vectorized wrapper for multiple environments, distributing each environment to its own
+/// process, allowing significant speed up when the environment is computationally complex.
+/// For performance reasons, if your environment is not IO bound, the number of environments should not exceed the
+/// number of logical cores on your CPU.
+/// </summary>
 public class SubprocVecEnv : VecEnv
 {
     public BaseEnv<DigitalSpace>[] Envs { get; init; }

@@ -1,1 +1,2 @@
-﻿global using Serilog;
+﻿global using NumpyDotNet;
+global using Serilog;

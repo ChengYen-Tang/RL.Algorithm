@@ -1,5 +1,4 @@
 ﻿using BaseRLEnv.Spaces;
-using NumpyDotNet;
 using System.Runtime.CompilerServices;
 
 namespace RL.Algorithm.VecEnvs;
@@ -68,14 +67,14 @@ public class StackedObservations
     /// <param name="dones"> numpy array of done info </param>
     /// <param name="infos"> numpy array of info dicts </param>
     /// <returns> tuple of the stacked observations and the updated infos </returns>
-    public (ndarray, Dictionary<string, dynamic>[]) Update(ndarray observation, bool[] dones, Dictionary<string, dynamic>[] infos)
+    public (ndarray, Dictionary<string, dynamic>[]) Update(ndarray observation, bool[] Terminated, bool[] Truncated, Dictionary<string, dynamic>[] infos)
     {
         int stackAxSize = Convert.ToInt32(observation.shape[stackDimension]);
         stackedobs = np.roll(stackedobs, shift: -stackAxSize, axis: stackDimension);
 
-        foreach((int i, bool done) in dones.Select((done, i) => (i, done)))
+        for (int i = 0; i < Terminated.Length; i++)
         {
-            if (done)
+            if (Terminated[i] || Truncated[i])
             {
                 if (infos[i].ContainsKey("terminal_observation"))
                 {

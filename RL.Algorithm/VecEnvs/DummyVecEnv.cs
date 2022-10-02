@@ -1,9 +1,15 @@
 ﻿using BaseRLEnv;
 using BaseRLEnv.Spaces;
-using NumpyDotNet;
 
 namespace RL.Algorithm.VecEnvs;
 
+/// <summary>
+/// Creates a simple vectorized wrapper for multiple environments, calling each environment in sequence on the current
+/// Python process.This is useful for computationally simple environment such as ``cartpole-v1``,
+/// as the overhead of multiprocess or multithread outweighs the environment computation time.
+/// This can also be used for RL methods that
+/// require a vectorized environment, but that you want a single environments to train with.
+/// </summary>
 public class DummyVecEnv : VecEnv
 {
     public BaseEnv<DigitalSpace>[] Envs { get; init; }

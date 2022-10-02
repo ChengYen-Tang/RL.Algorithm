@@ -34,6 +34,11 @@ public class DummyVecEnv : VecEnv
         for (var i = 0; i < NumEnvs; i++)
         {
             BaseRLEnv.StepResult step = Envs[i].Step((action[i] as ndarray)!);
+            if (step.Terminated || step.Truncated)
+            {
+                step.Info["terminal_observation"] = step.Observation;
+                Envs[i].Reset();
+            }
             observations[i] = step.Observation;
             rewards[i] = step.Reward;
             terminated[i] = step.Terminated;

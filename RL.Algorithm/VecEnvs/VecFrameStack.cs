@@ -1,5 +1,4 @@
 ﻿using BaseRLEnv;
-using BaseRLEnv.Spaces;
 
 namespace RL.Algorithm.VecEnvs;
 
@@ -43,10 +42,4 @@ public class VecFrameStack : VecEnvWrapper
         (ndarray observations, Dictionary<string, dynamic>[] infos) = stackedObservations.Update(result.Observation, result.Terminated, result.Truncated, result.Info);
         return new(observations, result.Reward, result.Terminated, result.Truncated, infos);
     }
-
-    public override void Close()
-        => VEnv.Close();
-
-    public override ndarray? Render(RanderMode randerMode)
-        => VEnv.Render(randerMode);
 }

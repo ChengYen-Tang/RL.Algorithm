@@ -1,5 +1,4 @@
 ﻿using BaseRLEnv;
-using BaseRLEnv.Spaces;
 
 namespace RL.Algorithm.VecEnvs;
 
@@ -37,7 +36,7 @@ public class DummyVecEnv : VecEnv
         var terminated = new bool[NumEnvs];
         var truncated = new bool[NumEnvs];
         var infos = new Dictionary<string, dynamic>[NumEnvs];
-        for (var i = 0; i < NumEnvs; i++)
+        for (int i = 0; i < NumEnvs; i++)
         {
             BaseRLEnv.StepResult step = Envs[i].Step((action[i] as ndarray)!);
             if (step.Terminated || step.Truncated)

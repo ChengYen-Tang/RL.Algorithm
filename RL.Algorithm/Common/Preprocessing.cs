@@ -1,6 +1,4 @@
-﻿using BaseRLEnv.Spaces;
-
-namespace RL.Algorithm;
+﻿namespace RL.Algorithm.Common;
 
 internal static class Preprocessing
 {
@@ -48,7 +46,7 @@ internal static class Preprocessing
 
         if (!checkChannels)
             return true;
-        long nChannels = (IsImageSpaceChannelsFirst((observationSpace as Box)!)) ? observationSpace.Shape[0] : observationSpace.Shape[-1];
+        long nChannels = IsImageSpaceChannelsFirst((observationSpace as Box)!) ? observationSpace.Shape[0] : observationSpace.Shape[-1];
         return isImageSpace_Channels.Contains(nChannels);
     }
 }

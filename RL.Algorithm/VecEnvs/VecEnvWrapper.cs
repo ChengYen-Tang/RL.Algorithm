@@ -1,4 +1,4 @@
-﻿using BaseRLEnv.Spaces;
+﻿using BaseRLEnv;
 
 namespace RL.Algorithm.VecEnvs;
 
@@ -18,4 +18,10 @@ public abstract class VecEnvWrapper : VecEnv
         ArgumentNullException.ThrowIfNull(vEnv);
         VEnv = vEnv;
     }
+
+    public override void Close()
+    => VEnv.Close();
+
+    public override ndarray? Render(RanderMode randerMode)
+        => VEnv.Render(randerMode);
 }

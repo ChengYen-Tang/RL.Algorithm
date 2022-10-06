@@ -16,9 +16,9 @@ public class VecNormalize : VecEnvWrapper
     private readonly RunningMeanStd retRMS;
     private readonly RunningMeanStd obsRMS;
 
-    public ndarray Returns;
-    public ndarray OldObs;
-    public double[] OldReward;
+    public ndarray Returns { get; private set; }
+    public ndarray OldObs { get; private set; }
+    public double[] OldReward { get; private set; }
 
     /// <summary></summary>
     /// <param name="venv"> the vectorized environment to wrap </param>

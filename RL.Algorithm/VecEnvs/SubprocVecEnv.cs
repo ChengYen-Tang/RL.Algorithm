@@ -15,10 +15,10 @@ public class SubprocVecEnv : VecEnv
     public SubprocVecEnv(BaseEnv<DigitalSpace>[] envs) : base(envs)
         => this.Envs = envs;
 
-    public override ResetResult Reset(uint? seed = null, Dictionary<string, dynamic>? options = null)
+    public override ResetResult Reset(uint? seed = null, Dictionary<string, object>? options = null)
     {
         var observations = new ndarray[NumEnvs];
-        var infos = new Dictionary<string, dynamic>[NumEnvs];
+        var infos = new Dictionary<string, object>[NumEnvs];
         Parallel.For(0, NumEnvs, i => {
             BaseRLEnv.ResetResult reset = Envs[i].Reset(seed, options);
             observations[i] = reset.Observation;
@@ -33,7 +33,7 @@ public class SubprocVecEnv : VecEnv
         var rewards = new double[NumEnvs];
         var terminated = new bool[NumEnvs];
         var truncated = new bool[NumEnvs];
-        var infos = new Dictionary<string, dynamic>[NumEnvs];
+        var infos = new Dictionary<string, object>[NumEnvs];
         Parallel.For(0, NumEnvs, i => {
             BaseRLEnv.StepResult step = Envs[i].Step((action[i] as ndarray)!);
             if (step.Terminated || step.Truncated)

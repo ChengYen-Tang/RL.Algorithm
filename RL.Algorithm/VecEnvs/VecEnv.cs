@@ -34,7 +34,7 @@ public abstract class VecEnv
         NumEnvs = numEnvs;
     }
 
-    public abstract ResetResult Reset(uint? seed = null, Dictionary<string, dynamic>? options = null);
+    public abstract ResetResult Reset(uint? seed = null, Dictionary<string, object>? options = null);
 
     public abstract StepResult Step(ndarray action);
 

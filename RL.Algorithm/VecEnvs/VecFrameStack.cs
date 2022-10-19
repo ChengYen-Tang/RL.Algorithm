@@ -29,7 +29,7 @@ public class VecFrameStack : VecEnvWrapper
         ObservationSpace = stackedObservations.StackObservationSpace(wrappedObsSpace);
     }
 
-    public override ResetResult Reset(uint? seed = null, Dictionary<string, dynamic>? options = null)
+    public override ResetResult Reset(uint? seed = null, Dictionary<string, object>? options = null)
     {
         ResetResult result = VEnv.Reset(seed, options);
         ndarray observation = stackedObservations.Reset(result.Observation);
@@ -39,7 +39,7 @@ public class VecFrameStack : VecEnvWrapper
     public override StepResult Step(ndarray action)
     {
         StepResult result = VEnv.Step(action);
-        (ndarray observations, Dictionary<string, dynamic>[] infos) = stackedObservations.Update(result.Observation, result.Terminated, result.Truncated, result.Info);
+        (ndarray observations, Dictionary<string, object>[] infos) = stackedObservations.Update(result.Observation, result.Terminated, result.Truncated, result.Info);
         return new(observations, result.Reward, result.Terminated, result.Truncated, infos);
     }
 }

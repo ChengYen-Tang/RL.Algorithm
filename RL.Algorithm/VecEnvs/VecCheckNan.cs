@@ -22,7 +22,7 @@ public class VecCheckNan : VecEnvWrapper
     public VecCheckNan(VecEnv vecEnv, bool raiseException, bool warnOnce, bool checkInf)
         : base(vecEnv) => (this.raiseException, this.warnOnce, this.checkInf, userWarned) = (raiseException, warnOnce, checkInf, false);
 
-    public override ResetResult Reset(uint? seed = null, Dictionary<string, dynamic>? options = null)
+    public override ResetResult Reset(uint? seed = null, Dictionary<string, object>? options = null)
     {
         ResetResult result = VEnv.Reset(seed, options);
         CheckValue(new() { { nameof(result.Observation), result.Observation } });
@@ -36,7 +36,7 @@ public class VecCheckNan : VecEnvWrapper
         return result;
     }
 
-    private void CheckValue(Dictionary<string, dynamic> kwargs)
+    private void CheckValue(Dictionary<string, object> kwargs)
     {
         if (!(raiseException && warnOnce && userWarned))
             return;
@@ -45,8 +45,8 @@ public class VecCheckNan : VecEnvWrapper
         Parallel.ForEach(kwargs.Keys, item => {
             if (kwargs[item].GetType() != typeof(ndarray))
                 kwargs[item] = np.array(kwargs[item]);
-            bool hasNaN = np.any(np.isnan(kwargs[item]));
-            bool hasInf = checkInf && np.any(np.isinf(kwargs[item]));
+            bool hasNaN = (bool)np.any(np.isnan(kwargs[item] as ndarray));
+            bool hasInf = checkInf && (bool)np.any(np.isinf(kwargs[item]));
             if (hasNaN)
                 found.Add((item, "NaN"));
             if (hasInf)

@@ -67,7 +67,7 @@ public class StackedObservations
     /// <param name="truncated"> bool array of truncated info </param>
     /// <param name="infos"> numpy array of info dicts </param>
     /// <returns> tuple of the stacked observations and the updated infos </returns>
-    public (ndarray, Dictionary<string, dynamic>[]) Update(ndarray observation, bool[] terminated, bool[] truncated, Dictionary<string, dynamic>[] infos)
+    public (ndarray, Dictionary<string, object>[]) Update(ndarray observation, bool[] terminated, bool[] truncated, Dictionary<string, object>[] infos)
     {
         int stackAxSize = Convert.ToInt32(observation.shape[stackDimension]);
         stackedobs = np.roll(stackedobs, shift: -stackAxSize, axis: stackDimension);
@@ -78,7 +78,7 @@ public class StackedObservations
             {
                 if (infos[i].ContainsKey("terminal_observation"))
                 {
-                    ndarray oldTerminal = infos[i]["terminal_observation"];
+                    ndarray oldTerminal = (infos[i]["terminal_observation"] as ndarray)!;
                     ndarray newTerminal = ChannelsFirst ? np.concatenate(new ndarray[] { (stackedobs[i, $":-{stackAxSize}", "..."] as ndarray)!, oldTerminal }, 0)
                         : np.concatenate(new ndarray[] { (stackedobs[i, "...", $":-{stackAxSize}"] as ndarray)!, oldTerminal }, stackDimension);
                     infos[i]["terminal_observation"] = newTerminal;

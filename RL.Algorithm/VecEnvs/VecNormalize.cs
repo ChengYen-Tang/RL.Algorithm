@@ -49,7 +49,7 @@ public class VecNormalize : VecEnvWrapper
         OldReward = Array.Empty<double>();
     }
 
-    public override ResetResult Reset(uint? seed = null, Dictionary<string, dynamic>? options = null)
+    public override ResetResult Reset(uint? seed = null, Dictionary<string, object>? options = null)
     {
         ResetResult result = VEnv.Reset();
         OldObs = result.Observation;
@@ -75,7 +75,7 @@ public class VecNormalize : VecEnvWrapper
         Parallel.For(0, NumEnvs, i => {
             if (result.Terminated[i] || result.Truncated[i])
             {
-                result.Info[i]["terminal_observation"] = NormalizeObs(result.Info[i]["terminal_observation"]);
+                result.Info[i]["terminal_observation"] = NormalizeObs((result.Info[i]["terminal_observation"] as ndarray)!);
                 dones[i] = true;
             }
             else

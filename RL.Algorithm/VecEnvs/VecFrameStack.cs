@@ -13,6 +13,13 @@ public class VecFrameStack : VecEnvWrapper
     /// <summary></summary>
     /// <param name="vEnv"> the vectorized environment to wrap </param>
     /// <param name="nStack"> Number of frames to stack </param>
+    /// <exception cref="Error"> VecFrameStack only works with gym.spaces.Box observation spaces </exception>
+    public VecFrameStack(VecEnv vEnv, int nStack)
+        : this(vEnv, nStack, ChannelsOrder.Default) { }
+
+    /// <summary></summary>
+    /// <param name="vEnv"> the vectorized environment to wrap </param>
+    /// <param name="nStack"> Number of frames to stack </param>
     /// <param name="channelsOrder">
     /// If "first", stack on first image dimension. If "last", stack on last dimension.
     /// If Default, automatically detect channel to stack over in case of image observation or default to "last" (default).
@@ -20,7 +27,7 @@ public class VecFrameStack : VecEnvWrapper
     /// </param>
     /// <exception cref="Error"> VecFrameStack only works with gym.spaces.Box observation spaces </exception>
     public VecFrameStack(VecEnv vEnv, int nStack, ChannelsOrder channelsOrder = ChannelsOrder.Default)
-        : base (vEnv)
+        : base(vEnv)
     {
         if (vEnv.ObservationSpace.GetType() != typeof(Box))
             throw new Error("VecFrameStack only works with gym.spaces.Box observation spaces");

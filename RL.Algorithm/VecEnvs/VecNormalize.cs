@@ -22,6 +22,11 @@ public class VecNormalize : VecEnvWrapper
 
     /// <summary></summary>
     /// <param name="venv"> the vectorized environment to wrap </param>
+    public VecNormalize(VecEnv venv)
+        : this(venv, true, true, true, 10, 10, 0.99, 1e-8) { }
+
+    /// <summary></summary>
+    /// <param name="venv"> the vectorized environment to wrap </param>
     /// <param name="training"> Whether to update or not the moving average </param>
     /// <param name="normObs"> Whether to normalize observation or not (default: True) </param>
     /// <param name="normReward"> Whether to normalize rewards or not (default: True) </param>
@@ -31,7 +36,7 @@ public class VecNormalize : VecEnvWrapper
     /// <param name="epsilon"> To avoid division by zero </param>
     public VecNormalize(VecEnv venv, bool training = true, bool normObs = true, bool normReward = true,
         double clipObs = 10, double clipReward = 10, double gamma = 0.99, double epsilon = 1e-8)
-        :base(venv)
+        : base(venv)
     {
         this.normObs = normObs;
 
@@ -72,7 +77,8 @@ public class VecNormalize : VecEnvWrapper
             UpdateReward(result.Reward);
 
         bool[] dones = new bool[NumEnvs];
-        Parallel.For(0, NumEnvs, i => {
+        Parallel.For(0, NumEnvs, i =>
+        {
             if (result.Terminated[i] || result.Truncated[i])
             {
                 result.Info[i]["terminal_observation"] = NormalizeObs((result.Info[i]["terminal_observation"] as ndarray)!);
@@ -82,7 +88,7 @@ public class VecNormalize : VecEnvWrapper
                 dones[i] = false;
         });
 
-        Returns[dones] = 0;
+        Returns[np.array(dones)] = 0;
         return new(NormalizeObs(result.Observation), NormalizeReward(result.Reward), result.Terminated, result.Truncated, result.Info);
     }
 

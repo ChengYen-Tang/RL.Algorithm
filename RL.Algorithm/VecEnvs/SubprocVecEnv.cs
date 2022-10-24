@@ -19,7 +19,8 @@ public class SubprocVecEnv : VecEnv
     {
         var observations = new ndarray[NumEnvs];
         var infos = new Dictionary<string, object>[NumEnvs];
-        Parallel.For(0, NumEnvs, i => {
+        Parallel.For(0, NumEnvs, i =>
+        {
             BaseRLEnv.ResetResult reset = Envs[i].Reset(seed, options);
             observations[i] = reset.Observation;
             infos[i] = reset.Info;
@@ -34,18 +35,25 @@ public class SubprocVecEnv : VecEnv
         var terminated = new bool[NumEnvs];
         var truncated = new bool[NumEnvs];
         var infos = new Dictionary<string, object>[NumEnvs];
-        Parallel.For(0, NumEnvs, i => {
+        Parallel.For(0, NumEnvs, i =>
+        {
             BaseRLEnv.StepResult step = Envs[i].Step((action[i] as ndarray)!);
-            if (step.Terminated || step.Truncated)
-            {
-                step.Info["terminal_observation"] = step.Observation;
-                Envs[i].Reset();
-            }
-            observations[i] = step.Observation;
             rewards[i] = step.Reward;
             terminated[i] = step.Terminated;
             truncated[i] = step.Truncated;
-            infos[i] = step.Info;
+
+            if (step.Terminated || step.Truncated)
+            {
+                BaseRLEnv.ResetResult reset = Envs[i].Reset();
+                observations[i] = reset.Observation;
+                infos[i] = reset.Info;
+                infos[i]["terminal_observation"] = step.Observation;
+            }
+            else
+            {
+                observations[i] = step.Observation;
+                infos[i] = step.Info;
+            }
         });
         return new StepResult(np.stack(observations), rewards, terminated, truncated, infos);
     }
@@ -64,7 +72,8 @@ public class SubprocVecEnv : VecEnv
 
     public override void Close()
     {
-        Parallel.ForEach(Envs, env => {
+        Parallel.ForEach(Envs, env =>
+        {
             env.Close();
         });
     }

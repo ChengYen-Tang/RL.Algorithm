@@ -39,16 +39,21 @@ public class DummyVecEnv : VecEnv
         for (int i = 0; i < NumEnvs; i++)
         {
             BaseRLEnv.StepResult step = Envs[i].Step((action[i] as ndarray)!);
-            if (step.Terminated || step.Truncated)
-            {
-                step.Info["terminal_observation"] = step.Observation;
-                Envs[i].Reset();
-            }
-            observations[i] = step.Observation;
             rewards[i] = step.Reward;
             terminated[i] = step.Terminated;
             truncated[i] = step.Truncated;
-            infos[i] = step.Info;
+            if (step.Terminated || step.Truncated)
+            {
+                BaseRLEnv.ResetResult reset = Envs[i].Reset();
+                observations[i] = reset.Observation;
+                infos[i] = reset.Info;
+                infos[i]["terminal_observation"] = step.Observation;
+            }
+            else
+            {
+                observations[i] = step.Observation;
+                infos[i] = step.Info;
+            }
         }
         return new StepResult(np.stack(observations), rewards, terminated, truncated, infos);
     }
@@ -58,7 +63,7 @@ public class DummyVecEnv : VecEnv
         List<ndarray> images = new();
         for (var i = 0; i < NumEnvs; i++)
         {
-            ndarray? image  = Envs[i].Render(randerMode);
+            ndarray? image = Envs[i].Render(randerMode);
             if (image is not null)
                 images.Add(image);
         }

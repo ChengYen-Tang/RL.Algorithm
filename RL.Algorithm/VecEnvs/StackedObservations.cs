@@ -80,7 +80,7 @@ public class StackedObservations
                 {
                     ndarray oldTerminal = (infos[i]["terminal_observation"] as ndarray)!;
                     ndarray newTerminal = ChannelsFirst ? np.concatenate(new ndarray[] { (stackedobs[i, $":-{stackAxSize}", "..."] as ndarray)!, oldTerminal }, axis: 0)
-                        : np.concatenate(new ndarray[] { (stackedobs[i, "...", new Slice(null, -stackAxSize, 1)] as ndarray)!, oldTerminal }, axis: stackDimension);
+                        : np.concatenate(new ndarray[] { (stackedobs[i, "...", ":-1"] as ndarray)!, oldTerminal }, axis: stackDimension);
                     infos[i]["terminal_observation"] = newTerminal;
                 }
                 else

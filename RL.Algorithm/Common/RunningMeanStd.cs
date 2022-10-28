@@ -4,7 +4,7 @@
 /// Calulates the running mean and std of a data stream
 /// https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
 /// </summary>
-internal class RunningMeanStd
+public class RunningMeanStd
 {
     public ndarray Mean { get; private set; }
     public ndarray Var { get; private set; }

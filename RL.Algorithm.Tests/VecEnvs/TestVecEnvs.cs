@@ -92,6 +92,66 @@ public class TestVecEnvs
         CheckVecEnvSpaces(vecEnvClass, space, obsAssert);
     }
 
+    [TestMethod]
+    public void TestFramestackVecEnv()
+    {
+        ndarray imageSpaceShapeArray = np.array(new int[] { 12, 8, 3 });
+        shape imageSpaceShape = new(imageSpaceShapeArray);
+        ndarray zeroActs = np.zeros(new shape(nEnvs) + imageSpaceShape);
+
+        ndarray transposedImageSpaceShapeArray = (imageSpaceShapeArray["::-1"] as ndarray)!;
+        shape transposedImageSpaceShape = new(transposedImageSpaceShapeArray);
+        ndarray transposedZeroActs = np.zeros(new shape(nEnvs) + transposedImageSpaceShape);
+
+        CustomGymEnv MakeImageEnv()
+            => new(new Box(np.zeros(imageSpaceShape, np.UInt8), np.ones(imageSpaceShape, np.UInt8) * 255, imageSpaceShape, np.UInt8));
+
+        CustomGymEnv MakeTransposedImageEnv()
+            => new(new Box(np.zeros(transposedImageSpaceShape, np.UInt8), np.ones(transposedImageSpaceShape, np.UInt8) * 255, transposedImageSpaceShape, np.UInt8));
+
+        CustomGymEnv MakeNoNImageEnv()
+            => new(new Box(np.zeros(2, np.UInt8), np.ones(2, np.UInt8), new shape(2), np.UInt8));
+
+        VecEnv vecEnv = new DummyVecEnv(Enumerable.Range(0, nEnvs).Select(_ => MakeImageEnv()).ToArray());
+        vecEnv = new VecFrameStack(vecEnv, 2);
+        Algorithm.VecEnvs.StepResult stepResult = vecEnv.Step(zeroActs);
+        vecEnv.Close();
+
+        // Should be stacked on the last dimension
+        Assert.AreEqual((int)imageSpaceShape[-1] * 2, (int)stepResult.Observation.shape[-1]);
+
+        // Try automatic stacking on first dimension now
+        vecEnv = new DummyVecEnv(Enumerable.Range(0, nEnvs).Select(_ => MakeTransposedImageEnv()).ToArray());
+        vecEnv = new VecFrameStack(vecEnv, 2);
+        stepResult = vecEnv.Step(transposedZeroActs);
+        vecEnv.Close();
+
+        // Should be stacked on the first dimension (note the transposing in make_transposed_image_env)
+        Assert.AreEqual((int)imageSpaceShape[-1] * 2, (int)stepResult.Observation.shape[1]);
+
+        // Try forcing dimensions
+        vecEnv = new DummyVecEnv(Enumerable.Range(0, nEnvs).Select(_ => MakeImageEnv()).ToArray());
+        vecEnv = new VecFrameStack(vecEnv, 2, ChannelsOrder.Last);
+        stepResult = vecEnv.Step(zeroActs);
+        vecEnv.Close();
+
+        // Should be stacked on the last dimension
+        Assert.AreEqual((int)imageSpaceShape[-1] * 2, (int)stepResult.Observation.shape[-1]);
+
+        // Try forcing dimensions
+        vecEnv = new DummyVecEnv(Enumerable.Range(0, nEnvs).Select(_ => MakeImageEnv()).ToArray());
+        vecEnv = new VecFrameStack(vecEnv, 2, ChannelsOrder.First);
+        stepResult = vecEnv.Step(zeroActs);
+        vecEnv.Close();
+
+        // Should be stacked on the first dimension
+        Assert.AreEqual((int)imageSpaceShape[0] * 2, (int)stepResult.Observation.shape[1]);
+
+        // Test that it works with non-image envs when no channels_order is given
+        vecEnv = new DummyVecEnv(Enumerable.Range(0, nEnvs).Select(_ => MakeNoNImageEnv()).ToArray());
+        vecEnv = new VecFrameStack(vecEnv, 2);
+    }
+
     private static void CheckVecEnvSpaces(Type vecEnvClass, DigitalSpace space, Action<ndarray> obsAssert)
     {
         CustomGymEnv MakeEnv()
@@ -118,7 +178,4 @@ public class TestVecEnvs
         foreach (object value in obs)
             Assert.IsTrue(space.CheckConditions((value as ndarray)!).IsSuccess);
     }
-
-    private CustomGymEnv MakeEnv(DigitalSpace space)
-        => (Activator.CreateInstance(typeof(CustomGymEnv), new object[] { space }) as CustomGymEnv)!;
 }

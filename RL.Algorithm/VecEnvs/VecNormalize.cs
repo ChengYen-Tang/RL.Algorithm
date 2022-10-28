@@ -13,9 +13,9 @@ public class VecNormalize : VecEnvWrapper
     private readonly double clipReward;
     private readonly double gamma;
     private readonly double epsilon;
-    private readonly RunningMeanStd retRMS;
-    private readonly RunningMeanStd obsRMS;
 
+    public RunningMeanStd RetRMS { get; init; }
+    public RunningMeanStd ObsRMS { get; init; }
     public ndarray Returns { get; private set; }
     public ndarray OldObs { get; private set; }
     public double[] OldReward { get; private set; }
@@ -40,8 +40,8 @@ public class VecNormalize : VecEnvWrapper
     {
         this.normObs = normObs;
 
-        obsRMS = new(ObservationSpace.Shape);
-        retRMS = new(new(Array.Empty<int>()));
+        ObsRMS = new(ObservationSpace.Shape);
+        RetRMS = new(new(Array.Empty<int>()));
         this.clipObs = clipObs;
         this.clipReward = clipReward;
 
@@ -60,7 +60,7 @@ public class VecNormalize : VecEnvWrapper
         OldObs = result.Observation;
         Returns = np.zeros(NumEnvs);
         if (training && normObs)
-            obsRMS.Update(result.Observation);
+            ObsRMS.Update(result.Observation);
         return new(NormalizeObs(result.Observation), result.Info);
     }
 
@@ -71,7 +71,7 @@ public class VecNormalize : VecEnvWrapper
         OldReward = result.Reward;
 
         if (training && normObs)
-            obsRMS.Update(result.Observation);
+            ObsRMS.Update(result.Observation);
 
         if (training)
             UpdateReward(result.Reward);
@@ -102,7 +102,7 @@ public class VecNormalize : VecEnvWrapper
     {
         ndarray obsTemp = obs.Copy();
         if (normObs)
-            obsTemp = NormalizeObs(obs, obsRMS).astype(np.Float32);
+            obsTemp = NormalizeObs(obs, ObsRMS).astype(np.Float32);
         return obsTemp;
     }
 
@@ -115,7 +115,7 @@ public class VecNormalize : VecEnvWrapper
     public double[] NormalizeReward(double[] reward)
     {
         if (normReward)
-            reward = np.clip(reward / np.sqrt(retRMS.Var + epsilon), -clipReward, clipReward).AsDoubleArray();
+            reward = np.clip(reward / np.sqrt(RetRMS.Var + epsilon), -clipReward, clipReward).AsDoubleArray();
         return reward;
     }
 
@@ -125,6 +125,6 @@ public class VecNormalize : VecEnvWrapper
     private void UpdateReward(double[] reward)
     {
         Returns = Returns * gamma + np.array(reward);
-        retRMS.Update(Returns);
+        RetRMS.Update(Returns);
     }
 }

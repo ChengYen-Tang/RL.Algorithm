@@ -8,8 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="BaseRLEnv" Version="1.0.3" />
-    <PackageReference Include="NumpyDotNet" Version="0.9.81" />
+    <PackageReference Include="NumpyDotNet" Version="0.9.82" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
   </ItemGroup>
-
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>RL.Algorithm.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>

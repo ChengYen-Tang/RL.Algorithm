@@ -19,7 +19,7 @@ public class VecCheckNan : VecEnvWrapper
     /// <param name="raiseException"> Whether or not to raise a ValueError, instead of a UserWarning </param>
     /// <param name="warnOnce"> Whether or not to only warn once. </param>
     /// <param name="checkInf"> Whether or not to check for +inf or -inf as well </param>
-    public VecCheckNan(VecEnv vecEnv, bool raiseException, bool warnOnce, bool checkInf)
+    public VecCheckNan(VecEnv vecEnv, bool raiseException = false, bool warnOnce = true, bool checkInf = true)
         : base(vecEnv) => (this.raiseException, this.warnOnce, this.checkInf, userWarned) = (raiseException, warnOnce, checkInf, false);
 
     public override ResetResult Reset(uint? seed = null, Dictionary<string, object>? options = null)
@@ -31,6 +31,7 @@ public class VecCheckNan : VecEnvWrapper
 
     public override StepResult Step(ndarray action)
     {
+        CheckValue(new() { { "Action", action } });
         StepResult result = VEnv.Step(action);
         CheckValue(new() { { nameof(result.Observation), result.Observation }, { nameof(result.Reward), result.Reward } });
         return result;
@@ -38,11 +39,12 @@ public class VecCheckNan : VecEnvWrapper
 
     private void CheckValue(Dictionary<string, object> kwargs)
     {
-        if (!(raiseException && warnOnce && userWarned))
+        if (!raiseException && warnOnce && userWarned)
             return;
 
         ConcurrentBag<(string, string)> found = new();
-        Parallel.ForEach(kwargs.Keys, item => {
+        Parallel.ForEach(kwargs.Keys, item =>
+        {
             if (kwargs[item].GetType() != typeof(ndarray))
                 kwargs[item] = np.array(kwargs[item]);
             bool hasNaN = (bool)np.any(np.isnan(kwargs[item] as ndarray));

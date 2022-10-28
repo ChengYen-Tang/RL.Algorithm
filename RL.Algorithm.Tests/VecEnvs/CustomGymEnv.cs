@@ -8,7 +8,7 @@ public class CustomGymEnv : BaseEnv<DigitalSpace>
     private Random rnd = null!;
 
     public CustomGymEnv(DigitalSpace space)
-        => (ActionSpace, ObservationSpace, currentStep, epLength) = (space, space, 0, 4);
+        => (ActionSpace, ObservationSpace, currentStep, epLength, rnd) = (space, space, 0, 4, new());
 
     public override ndarray? Render(RanderMode randerMode)
     {

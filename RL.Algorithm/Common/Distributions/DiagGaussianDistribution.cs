@@ -7,6 +7,8 @@ internal class DiagGaussianDistribution : Distribution, IProbaWithParameter
 {
     private readonly int actionDim;
 
+    /// <summary></summary>
+    /// <param name="actionDim"> Dimension of the action space. </param>
     public DiagGaussianDistribution(int actionDim)
         => this.actionDim = actionDim;
 
@@ -17,7 +19,7 @@ internal class DiagGaussianDistribution : Distribution, IProbaWithParameter
         return (nn.Linear(latentDim, actionDim), nn.Parameter(ones(actionDim) * logStdInit, true));
     }
 
-    public IProbaWithParameter ProbaDistribution(IDictionary<string, object> kwargs)
+    public virtual IProbaWithParameter ProbaDistribution(IDictionary<string, object> kwargs)
     {
         Tensor meanActions = (kwargs["mean_actions"] as Tensor)!;
         Tensor logStd = (kwargs["log_std"] as Tensor)!;
@@ -36,7 +38,7 @@ internal class DiagGaussianDistribution : Distribution, IProbaWithParameter
         return GetActions(deterministic);
     }
 
-    public override Tensor Entropy()
+    public override Tensor? Entropy()
         => SumIndependentDims(distribution.entropy());
 
     public override Tensor LogProb(Tensor actions)

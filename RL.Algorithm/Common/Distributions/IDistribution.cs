@@ -12,7 +12,7 @@ internal interface IDistribution
     /// Returns Shannon's entropy of the probability
     /// </summary>
     /// <returns> the entropy, or None if no analytical form is known </returns>
-    Tensor Entropy();
+    Tensor? Entropy();
     /// <summary>
     /// Returns a sample from the probability distribution
     /// </summary>

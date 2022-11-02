@@ -17,7 +17,7 @@ internal abstract class Distribution : IDistribution
         => tensor.shape.Length > 1 ? tensor.sum(dim: 1) : tensor.sum();
 
     public abstract Tensor ActionsFromParams(IDictionary<string, object> kwargs);
-    public abstract Tensor Entropy();
+    public abstract Tensor? Entropy();
     public abstract Tensor LogProb(Tensor x);
     public abstract Tensor[] LogProbFromParams(IDictionary<string, object> kwargs);
     public abstract Tensor Mode();

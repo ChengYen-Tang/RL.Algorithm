@@ -49,9 +49,7 @@ internal class DiagGaussianDistribution : Distribution, IProbaWithParameter
 
     public override Tensor[] LogProbFromParams(IDictionary<string, object> kwargs)
     {
-        Tensor meanActions = (kwargs["mean_actions"] as Tensor)!;
-        Tensor logStd = (kwargs["log_std"] as Tensor)!;
-        Tensor actions = ActionsFromParams(new Dictionary<string, object>() { { "mean_actions", meanActions }, { "log_std", logStd } });
+        Tensor actions = ActionsFromParams(kwargs);
         Tensor logProb = LogProb(actions);
         return new[] { actions, logProb };
     }

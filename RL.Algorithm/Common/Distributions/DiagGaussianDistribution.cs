@@ -6,6 +6,7 @@
 internal class DiagGaussianDistribution : Distribution, IProbaWithParameter
 {
     private readonly int actionDim;
+    private distributions.Distribution distribution = null!;
 
     /// <summary></summary>
     /// <param name="actionDim"> Dimension of the action space. </param>

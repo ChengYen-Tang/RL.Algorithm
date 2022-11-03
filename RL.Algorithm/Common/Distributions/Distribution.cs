@@ -2,8 +2,6 @@
 
 internal abstract class Distribution : IDistribution
 {
-    protected distributions.Distribution distribution = null!;
-
     public Tensor GetActions(bool deterministic = false)
         => deterministic ? Mode() : Sample();
 

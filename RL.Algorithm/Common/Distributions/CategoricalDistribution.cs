@@ -6,6 +6,7 @@
 internal class CategoricalDistribution : Distribution, IProba
 {
     private readonly int actionDim;
+    private Categorical distribution = null!;
 
     public CategoricalDistribution(int actionDim)
         => this.actionDim = actionDim;
@@ -19,7 +20,7 @@ internal class CategoricalDistribution : Distribution, IProba
     public IProba ProbaDistribution(IDictionary<string, object> kwargs)
     {
         Tensor actionLogits = (kwargs["action_logits"] as Tensor)!;
-        distribution = new Categorical(actionLogits);
+        distribution = new(actionLogits);
         return this;
     }
 
@@ -44,7 +45,7 @@ internal class CategoricalDistribution : Distribution, IProba
     }
 
     public override Tensor Mode()
-        => argmax((distribution as Categorical)!.probs, dim: 1);
+        => argmax(distribution.probs, dim: 1);
 
     public override Tensor Sample()
         => distribution.sample();

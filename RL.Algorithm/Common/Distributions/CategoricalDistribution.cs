@@ -20,7 +20,7 @@ internal class CategoricalDistribution : Distribution, IProba
     public IProba ProbaDistribution(IDictionary<string, object> kwargs)
     {
         Tensor actionLogits = (kwargs["action_logits"] as Tensor)!;
-        distribution = new(actionLogits);
+        distribution = new(logits: actionLogits);
         return this;
     }
 

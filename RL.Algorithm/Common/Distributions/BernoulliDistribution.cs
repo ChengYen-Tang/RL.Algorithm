@@ -1,14 +1,14 @@
 ﻿namespace RL.Algorithm.Common.Distributions;
 
 /// <summary>
-/// MultiCategorical distribution for multi discrete actions.
+/// Bernoulli distribution for MultiBinary action spaces.
 /// </summary>
-internal class MultiCategoricalDistribution : Distribution, IProba
+internal class BernoulliDistribution : Distribution, IProba
 {
-    private readonly long[] actionDims;
-    private Categorical[] distribution = null!;
+    private readonly int actionDims;
+    private Bernoulli distribution = null!;
 
-    public MultiCategoricalDistribution(long[] actionDims)
+    public BernoulliDistribution(int actionDims)
         => this.actionDims = actionDims;
 
     public override Tensor ActionsFromParams(IDictionary<string, object> kwargs)
@@ -19,10 +19,10 @@ internal class MultiCategoricalDistribution : Distribution, IProba
     }
 
     public override Tensor? Entropy()
-        => stack(distribution.Select(dist => dist.entropy()), dim: 1).sum(dim: 1);
+        => distribution.entropy().sum(dim: 1);
 
     public override Tensor LogProb(Tensor actions)
-        => stack(Enumerable.Zip(distribution, unbind(actions, dim: 1)).Select(item => item.First.log_prob(item.Second)), dim: 1).sum(dim: 1);
+        => distribution.log_prob(actions).sum(dim: 1);
 
     public override Tensor[] LogProbFromParams(IDictionary<string, object> kwargs)
     {
@@ -32,21 +32,21 @@ internal class MultiCategoricalDistribution : Distribution, IProba
     }
 
     public override Tensor Mode()
-        => stack(distribution.Select(dist => argmax(dist.probs, dim: 1)), dim: 1);
+        => round(distribution.probs);
 
     public IProba ProbaDistribution(IDictionary<string, object> kwargs)
     {
         Tensor actionLogits = (kwargs["action_logits"] as Tensor)!;
-        distribution = actionLogits.split(actionDims, dim: 1).Select(item => new Categorical(logits: item)).ToArray();
+        distribution = new(l: actionLogits);
         return this;
     }
 
     public nn.Module ProbaDistributionNet(IDictionary<string, object> kwargs)
     {
         int latentDim = (int)kwargs["latent_dim"];
-        return nn.Linear(latentDim, actionDims.Sum());
+        return nn.Linear(latentDim, actionDims);
     }
 
     public override Tensor Sample()
-        => stack(distribution.Select(dist => dist.sample()), dim: 1);
+        => distribution.sample();
 }

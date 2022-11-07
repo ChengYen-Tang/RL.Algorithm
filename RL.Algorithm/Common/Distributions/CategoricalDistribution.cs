@@ -27,7 +27,7 @@ internal class CategoricalDistribution : Distribution, IProba
     public override Tensor ActionsFromParams(IDictionary<string, object> kwargs)
     {
         ProbaDistribution(kwargs);
-        bool deterministic = kwargs.ContainsKey("deterministic") ? (bool)kwargs["deterministic"] : false;
+        bool deterministic = kwargs.ContainsKey("deterministic") && (bool)kwargs["deterministic"];
         return GetActions(deterministic);
     }
 

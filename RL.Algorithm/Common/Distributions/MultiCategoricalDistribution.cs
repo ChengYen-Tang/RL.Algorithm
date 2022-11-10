@@ -6,7 +6,7 @@
 internal class MultiCategoricalDistribution : Distribution, IProba
 {
     private readonly long[] actionDims;
-    private Categorical[] distribution = null!;
+    public Categorical[] Distribution { get; private set; } = null!;
 
     public MultiCategoricalDistribution(long[] actionDims)
         => this.actionDims = actionDims;
@@ -19,10 +19,10 @@ internal class MultiCategoricalDistribution : Distribution, IProba
     }
 
     public override Tensor? Entropy()
-        => stack(distribution.Select(dist => dist.entropy()), dim: 1).sum(dim: 1);
+        => stack(Distribution.Select(dist => dist.entropy()), dim: 1).sum(dim: 1);
 
     public override Tensor LogProb(Tensor actions)
-        => stack(Enumerable.Zip(distribution, unbind(actions, dim: 1)).Select(item => item.First.log_prob(item.Second)), dim: 1).sum(dim: 1);
+        => stack(Enumerable.Zip(Distribution, unbind(actions, dim: 1)).Select(item => item.First.log_prob(item.Second)), dim: 1).sum(dim: 1);
 
     public override Tensor[] LogProbFromParams(IDictionary<string, object> kwargs)
     {
@@ -32,12 +32,12 @@ internal class MultiCategoricalDistribution : Distribution, IProba
     }
 
     public override Tensor Mode()
-        => stack(distribution.Select(dist => argmax(dist.probs, dim: 1)), dim: 1);
+        => stack(Distribution.Select(dist => argmax(dist.probs, dim: 1)), dim: 1);
 
     public IProba ProbaDistribution(IDictionary<string, object> kwargs)
     {
         Tensor actionLogits = (kwargs["action_logits"] as Tensor)!;
-        distribution = actionLogits.split(actionDims, dim: 1).Select(item => new Categorical(logits: item)).ToArray();
+        Distribution = actionLogits.split(actionDims, dim: 1).Select(item => new Categorical(logits: item)).ToArray();
         return this;
     }
 
@@ -48,5 +48,5 @@ internal class MultiCategoricalDistribution : Distribution, IProba
     }
 
     public override Tensor Sample()
-        => stack(distribution.Select(dist => dist.sample()), dim: 1);
+        => stack(Distribution.Select(dist => dist.sample()), dim: 1);
 }

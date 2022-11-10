@@ -6,7 +6,7 @@
 internal class CategoricalDistribution : Distribution, IProba
 {
     private readonly int actionDim;
-    private Categorical distribution = null!;
+    public Categorical Distribution { get; private set; } = null!;
 
     public CategoricalDistribution(int actionDim)
         => this.actionDim = actionDim;
@@ -20,7 +20,7 @@ internal class CategoricalDistribution : Distribution, IProba
     public IProba ProbaDistribution(IDictionary<string, object> kwargs)
     {
         Tensor actionLogits = (kwargs["action_logits"] as Tensor)!;
-        distribution = new(logits: actionLogits);
+        Distribution = new(logits: actionLogits);
         return this;
     }
 
@@ -32,10 +32,10 @@ internal class CategoricalDistribution : Distribution, IProba
     }
 
     public override Tensor? Entropy()
-        => distribution.entropy();
+        => Distribution.entropy();
 
     public override Tensor LogProb(Tensor actions)
-        => distribution.log_prob(actions);
+        => Distribution.log_prob(actions);
 
     public override Tensor[] LogProbFromParams(IDictionary<string, object> kwargs)
     {
@@ -45,8 +45,8 @@ internal class CategoricalDistribution : Distribution, IProba
     }
 
     public override Tensor Mode()
-        => argmax(distribution.probs, dim: 1);
+        => argmax(Distribution.probs, dim: 1);
 
     public override Tensor Sample()
-        => distribution.sample();
+        => Distribution.sample();
 }

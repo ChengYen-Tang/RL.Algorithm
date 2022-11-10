@@ -1,6 +1,6 @@
 ﻿namespace RL.Algorithm.Common.Distributions;
 
-internal interface IDistribution
+public interface IDistribution
 {
     /// <summary>
     /// Returns the log likelihood
@@ -29,7 +29,7 @@ internal interface IDistribution
     /// </summary>
     /// <param name="deterministic"></param>
     /// <returns></returns>
-    Tensor GetActions(bool deterministic);
+    Tensor GetActions(bool deterministic = false);
     /// <summary>
     /// Returns samples from the probability distribution
     ///    given its parameters.
@@ -46,7 +46,7 @@ internal interface IDistribution
     Tensor[] LogProbFromParams(IDictionary<string, object> kwargs);
 }
 
-internal interface IProba : IDistribution
+public interface IProba : IDistribution
 {
     /// <summary>
     /// Create the layers and parameters that represent the distribution.
@@ -64,7 +64,7 @@ internal interface IProba : IDistribution
     IProba ProbaDistribution(IDictionary<string, object> kwargs);
 }
 
-internal interface IProbaWithParameter : IDistribution
+public interface IProbaWithParameter : IDistribution
 {
     /// <summary>
     /// Create the layers and parameters that represent the distribution.

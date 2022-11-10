@@ -6,7 +6,7 @@
 internal class BernoulliDistribution : Distribution, IProba
 {
     private readonly int actionDims;
-    private Bernoulli distribution = null!;
+    public Bernoulli Distribution { get; private set; } = null!;
 
     public BernoulliDistribution(int actionDims)
         => this.actionDims = actionDims;
@@ -19,10 +19,10 @@ internal class BernoulliDistribution : Distribution, IProba
     }
 
     public override Tensor? Entropy()
-        => distribution.entropy().sum(dim: 1);
+        => Distribution.entropy().sum(dim: 1);
 
     public override Tensor LogProb(Tensor actions)
-        => distribution.log_prob(actions).sum(dim: 1);
+        => Distribution.log_prob(actions).sum(dim: 1);
 
     public override Tensor[] LogProbFromParams(IDictionary<string, object> kwargs)
     {
@@ -32,12 +32,12 @@ internal class BernoulliDistribution : Distribution, IProba
     }
 
     public override Tensor Mode()
-        => round(distribution.probs);
+        => round(Distribution.probs);
 
     public IProba ProbaDistribution(IDictionary<string, object> kwargs)
     {
         Tensor actionLogits = (kwargs["action_logits"] as Tensor)!;
-        distribution = new(l: actionLogits);
+        Distribution = new(l: actionLogits);
         return this;
     }
 
@@ -48,5 +48,5 @@ internal class BernoulliDistribution : Distribution, IProba
     }
 
     public override Tensor Sample()
-        => distribution.sample();
+        => Distribution.sample();
 }

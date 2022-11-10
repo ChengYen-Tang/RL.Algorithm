@@ -14,7 +14,8 @@ internal class StateDependentNoiseDistribution : Distribution, IProbaWithParamet
     private Tensor explorationMat = null!;
     private Tensor explorationMatrices = null!;
     private Tensor latentSde = null!;
-    private Normal distribution = null!;
+
+    public Normal Distribution { get; private set; } = null!;
 
     public StateDependentNoiseDistribution(int actionDim, bool fullStd = true, bool useExpln = false, bool squashOutput = false, bool learnFeatures = false, double epsilon = 1e-6)
         => (this.actionDim, this.useExpln, this.fullStd, this.epsilon, this.learnFeatures, bijector)
@@ -33,7 +34,7 @@ internal class StateDependentNoiseDistribution : Distribution, IProbaWithParamet
             // No analytical form,
             // entropy needs to be estimated using -log_prob.mean()
             return null;
-        return SumIndependentDims(distribution.entropy());
+        return SumIndependentDims(Distribution.entropy());
     }
 
     public Tensor GetNoise(Tensor latentSde)
@@ -83,7 +84,7 @@ internal class StateDependentNoiseDistribution : Distribution, IProbaWithParamet
     {
         Tensor gaussianActions = bijector is not null ? TanhBijector.Inverse(actions) : actions;
         // log likelihood for a gaussian
-        Tensor logProb = distribution.log_prob(gaussianActions);
+        Tensor logProb = Distribution.log_prob(gaussianActions);
         // Sum along action dim
         logProb = SumIndependentDims(logProb);
 
@@ -102,7 +103,7 @@ internal class StateDependentNoiseDistribution : Distribution, IProbaWithParamet
 
     public override Tensor Mode()
     {
-        Tensor actions = distribution.mean;
+        Tensor actions = Distribution.mean;
         if (bijector is not null)
             return TanhBijector.Forward(actions);
         return actions;
@@ -115,7 +116,7 @@ internal class StateDependentNoiseDistribution : Distribution, IProbaWithParamet
         Tensor logStd = (kwargs["log_std"] as Tensor)!;
         Tensor variance = mm(this.latentSde.pow(2), GetStd(logStd).pow(2));
         Tensor meanActions = (kwargs["mean_actions"] as Tensor)!;
-        distribution = new Normal(meanActions, sqrt(variance + epsilon));
+        Distribution = new Normal(meanActions, sqrt(variance + epsilon));
         return this;
     }
 
@@ -131,7 +132,7 @@ internal class StateDependentNoiseDistribution : Distribution, IProbaWithParamet
         // Reduce the number of parameters if needed
         Tensor logStd = fullStd ? ones(this.latentSdeDim, actionDim) : ones(this.latentSdeDim, 1);
         // Transform it to a parameter so it can be optimized
-        float logStdInit = (float)kwargs["log_std_init"];
+        Tensor logStdInit = kwargs.ContainsKey("log_std_init") ? (kwargs["log_std_init"] as Tensor)! : -2.0f;
         logStd = nn.Parameter(logStd * logStdInit, requires_grad: true);
         // Sample an exploration matrix
         SampleWeights(logStd);
@@ -141,7 +142,7 @@ internal class StateDependentNoiseDistribution : Distribution, IProbaWithParamet
     public override Tensor Sample()
     {
         Tensor noise = GetNoise(latentSde);
-        Tensor actions = distribution.mean + noise;
+        Tensor actions = Distribution.mean + noise;
         if (bijector is not null)
             TanhBijector.Forward(actions);
         return actions;

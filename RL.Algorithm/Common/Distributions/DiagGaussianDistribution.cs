@@ -6,7 +6,7 @@
 internal class DiagGaussianDistribution : Distribution, IProbaWithParameter
 {
     private readonly int actionDim;
-    private distributions.Distribution distribution = null!;
+    public Normal Distribution { get; private set; } = null!;
 
     /// <summary></summary>
     /// <param name="actionDim"> Dimension of the action space. </param>
@@ -16,7 +16,7 @@ internal class DiagGaussianDistribution : Distribution, IProbaWithParameter
     public (nn.Module, Parameter) ProbaDistributionNet(IDictionary<string, object> kwargs)
     {
         int latentDim = (int)kwargs["latent_dim"];
-        double logStdInit = kwargs.ContainsKey("log_std_init") ? (double)kwargs["log_std_init"] : 0.0;
+        Tensor logStdInit = kwargs.ContainsKey("log_std_init") ? (kwargs["log_std_init"] as Tensor)! : 0.0;
         return (nn.Linear(latentDim, actionDim), nn.Parameter(ones(actionDim) * logStdInit, true));
     }
 
@@ -25,12 +25,12 @@ internal class DiagGaussianDistribution : Distribution, IProbaWithParameter
         Tensor meanActions = (kwargs["mean_actions"] as Tensor)!;
         Tensor logStd = (kwargs["log_std"] as Tensor)!;
         Tensor actionStd = ones_like(meanActions) * logStd.exp();
-        distribution = new Normal(meanActions, actionStd);
+        Distribution = new(meanActions, actionStd);
         return this;
     }
 
     public override Tensor Sample()
-        => distribution.rsample();
+        => Distribution.rsample();
 
     public override Tensor ActionsFromParams(IDictionary<string, object> kwargs)
     {
@@ -40,11 +40,11 @@ internal class DiagGaussianDistribution : Distribution, IProbaWithParameter
     }
 
     public override Tensor? Entropy()
-        => SumIndependentDims(distribution.entropy());
+        => SumIndependentDims(Distribution.entropy());
 
     public override Tensor LogProb(Tensor actions)
     {
-        Tensor logProb = distribution.log_prob(actions);
+        Tensor logProb = Distribution.log_prob(actions);
         return SumIndependentDims(logProb);
     }
 
@@ -56,5 +56,5 @@ internal class DiagGaussianDistribution : Distribution, IProbaWithParameter
     }
 
     public override Tensor Mode()
-        => distribution.mean;
+        => Distribution.mean;
 }

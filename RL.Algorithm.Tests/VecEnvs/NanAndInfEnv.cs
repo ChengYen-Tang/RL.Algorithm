@@ -1,6 +1,6 @@
 ﻿namespace RL.Algorithm.Tests.VecEnvs;
 
-public class NanAndInfEnv : BaseEnv<DigitalSpace>
+public class NanAndInfEnv : DigitalEnv
 {
     public NanAndInfEnv()
     {

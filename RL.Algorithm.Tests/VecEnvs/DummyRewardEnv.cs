@@ -1,6 +1,6 @@
 ﻿namespace RL.Algorithm.Tests.VecEnvs;
 
-public class DummyRewardEnv : BaseEnv<DigitalSpace>
+public class DummyRewardEnv : DigitalEnv
 {
     private readonly int[] returnedRewards;
     private readonly int returnRewardIdx;

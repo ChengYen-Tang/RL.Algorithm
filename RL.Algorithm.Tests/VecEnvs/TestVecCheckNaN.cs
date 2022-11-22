@@ -8,7 +8,7 @@ public class TestVecCheckNaN
     [TestInitialize]
     public void Init()
     {
-        env = new DummyVecEnv(new BaseEnv<DigitalSpace>[] { new NanAndInfEnv() });
+        env = new DummyVecEnv(new DigitalEnv[] { new NanAndInfEnv() });
         env = new VecCheckNan(env, raiseException: true);
         env.Step(np.array(new double[,] { { 0 } }));
     }

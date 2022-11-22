@@ -1,6 +1,6 @@
 ﻿namespace RL.Algorithm.Tests.VecEnvs;
 
-public class StepEnv : BaseEnv<DigitalSpace>
+public class StepEnv : DigitalEnv
 {
     private readonly int maxSteps;
     private int currentStep;

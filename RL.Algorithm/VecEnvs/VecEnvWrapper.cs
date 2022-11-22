@@ -1,6 +1,4 @@
-﻿using BaseRLEnv;
-
-namespace RL.Algorithm.VecEnvs;
+﻿namespace RL.Algorithm.VecEnvs;
 
 public abstract class VecEnvWrapper : VecEnv
 {

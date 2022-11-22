@@ -1,8 +1,9 @@
-global using BaseRLEnv;
-global using BaseRLEnv.Spaces;
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
 global using NumpyDotNet;
 global using RL.Algorithm.VecEnvs;
+global using RL.Env;
+global using RL.Env.Envs;
+global using RL.Env.Spaces;
 global using static TorchSharp.torch;
-global using ResetResult = BaseRLEnv.ResetResult;
-global using StepResult = BaseRLEnv.StepResult;
+global using ResetResult = RL.Env.ResetResult;
+global using StepResult = RL.Env.StepResult;

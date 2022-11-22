@@ -1,6 +1,4 @@
-﻿using BaseRLEnv;
-
-namespace RL.Algorithm.VecEnvs;
+﻿namespace RL.Algorithm.VecEnvs;
 
 /// <summary>
 /// Creates a multiprocess vectorized wrapper for multiple environments, distributing each environment to its own
@@ -10,9 +8,9 @@ namespace RL.Algorithm.VecEnvs;
 /// </summary>
 public class SubprocVecEnv : VecEnv
 {
-    public BaseEnv<DigitalSpace>[] Envs { get; init; }
+    public DigitalEnv[] Envs { get; init; }
 
-    public SubprocVecEnv(BaseEnv<DigitalSpace>[] envs) : base(envs)
+    public SubprocVecEnv(DigitalEnv[] envs) : base(envs)
         => this.Envs = envs;
 
     public override ResetResult Reset(uint? seed = null, Dictionary<string, object>? options = null)
@@ -21,7 +19,7 @@ public class SubprocVecEnv : VecEnv
         var infos = new Dictionary<string, object>[NumEnvs];
         Parallel.For(0, NumEnvs, i =>
         {
-            BaseRLEnv.ResetResult reset = Envs[i].Reset(seed, options);
+            Env.ResetResult reset = Envs[i].Reset(seed, options);
             observations[i] = reset.Observation;
             infos[i] = reset.Info;
         });
@@ -37,14 +35,14 @@ public class SubprocVecEnv : VecEnv
         var infos = new Dictionary<string, object>[NumEnvs];
         Parallel.For(0, NumEnvs, i =>
         {
-            BaseRLEnv.StepResult step = Envs[i].Step((action[i] as ndarray)!);
+            Env.StepResult step = Envs[i].Step((action[i] as ndarray)!);
             rewards[i] = step.Reward;
             terminated[i] = step.Terminated;
             truncated[i] = step.Truncated;
 
             if (step.Terminated || step.Truncated)
             {
-                BaseRLEnv.ResetResult reset = Envs[i].Reset();
+                Env.ResetResult reset = Envs[i].Reset();
                 observations[i] = reset.Observation;
                 infos[i] = reset.Info;
                 infos[i]["terminal_observation"] = step.Observation;

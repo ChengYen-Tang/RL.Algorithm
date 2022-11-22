@@ -1,6 +1,6 @@
 ﻿namespace RL.Algorithm.Tests.VecEnvs;
 
-public class CustomGymEnv : BaseEnv<DigitalSpace>
+public class CustomGymEnv : DigitalEnv
 {
     private readonly int epLength;
     private int currentStep;

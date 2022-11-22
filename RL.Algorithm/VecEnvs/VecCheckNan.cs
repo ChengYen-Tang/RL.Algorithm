@@ -1,5 +1,4 @@
-﻿using BaseRLEnv;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
 namespace RL.Algorithm.VecEnvs;
 
@@ -61,7 +60,7 @@ public class VecCheckNan : VecEnvWrapper
         userWarned = true;
         string errorMessage = string.Join('\n', found.AsParallel().Select(item => $"Found {item.Item2} in {item.Item1}\n{kwargs[item.Item1]}"));
         if (raiseException)
-            throw new Error(errorMessage);
+            throw new Env.Error(errorMessage);
         else
             Log.Warning(errorMessage);
     }

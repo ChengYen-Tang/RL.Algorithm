@@ -8,8 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="morelinq" Version="3.3.2" />
     <PackageReference Include="NumpyDotNet" Version="0.9.82.1" />
-    <PackageReference Include="RL.Env" Version="1.0.5" />
+    <PackageReference Include="RL.Env" Version="1.0.6" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
     <PackageReference Include="TorchSharp" Version="0.99.0" />
   </ItemGroup>

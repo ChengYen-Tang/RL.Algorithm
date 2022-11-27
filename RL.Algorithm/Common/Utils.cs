@@ -23,7 +23,7 @@ public static class Utils
                 return torch.device(value);
             });
 
-        if (thDevice.type == DeviceType.CUDA && false)
+        if (thDevice.type == DeviceType.CUDA && !cuda.is_available())
             return torch.device("cpu");
         return thDevice;
     }
